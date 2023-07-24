@@ -5,3 +5,10 @@ __pycache__
 *.toml
 *.csv
 out/*
+
+#PyInstaller files
+dist/
+build/
+*.spec
+
+*.log

@@ -9,7 +9,7 @@ from colorit import *
 import time
 import tomllib
 
-with open("config.toml", "rb") as f:
+with open("..\config.toml", "rb") as f:
     toml_dict = tomllib.load(f)
 
 # Use this to ensure that ColorIt will be usable by certain command line interfaces

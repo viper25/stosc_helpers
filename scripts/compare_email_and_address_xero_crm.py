@@ -9,7 +9,7 @@ from colorama import init, Fore
 init(autoreset=True)
 
 # Load config
-with open("config.toml", "rb") as f:
+with open("..\config.toml", "rb") as f:
     config = tomllib.load(f)
 
 FILE_MEMBERS = config['gb_eligibility']['FILE_MEMBERS']

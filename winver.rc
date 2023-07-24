@@ -1,0 +1,23 @@
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(0, 0, 1, 0),
+    prodvers=(0, 0, 1, 0),
+    date=(0, 0)
+    ),
+  kids=[
+    StringFileInfo(
+      [
+      StringTable(
+        u'040904B0',
+        [StringStruct(u'CompanyName', u'STOSC'),
+        StringStruct(u'FileDescription', u'STOSC Helper'),
+        StringStruct(u'FileVersion', u'0.0.5'),
+        StringStruct(u'InternalName', u'stosc_helper'),
+        StringStruct(u'LegalCopyright', u'\xa9 STOSC. All rights reserved.'),
+        StringStruct(u'OriginalFilename', u'stosc.exe'),
+        StringStruct(u'ProductName', u'STOSC Helper'),
+        StringStruct(u'ProductVersion', u'0.0.5')])
+      ]),
+    VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
+  ]
+)

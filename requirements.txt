@@ -1,3 +1,4 @@
 tkcalendar
 boto3
-'mysql-connector-python'
+mysql-connector-python
+pyinstaller

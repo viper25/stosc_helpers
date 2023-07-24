@@ -124,7 +124,7 @@ def save_to_file(members, save_file: str):
 
 if __name__ == "__main__":
     # Load config
-    with open("config.toml", "rb") as f:
+    with open("..\config.toml", "rb") as f:
         config = tomllib.load(f)
     # Date to compare against. This should be the date of GB announcement
     DATE_OF_GB_ELIGIBILITY_CHECK = datetime.strptime(config['gb_eligibility']['DATE_OF_GB_ELIGIBILITY_CHECK_STR'],
@@ -132,7 +132,6 @@ if __name__ == "__main__":
     EXLUSION_LIST = config['gb_eligibility']['EXLUSION_LIST']
 
     eligibility_lists = process_eligible_GB_members(
-        member_list_file_path=config['gb_eligibility']['FILE_MEMBERS'],
         update_db_flag=config['gb_eligibility']['UPDATE_CRM_DB'],
         save_file=config['gb_eligibility']['FILE_ELIGIBLE_GB_MEMBERS']
     )
