@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import datetime
 import boto3
 from boto3.dynamodb.conditions import Key
@@ -202,3 +202,9 @@ class my_logger():
     def info(msg, Color=Colors.white):
         print(color(f"{msg}", Color))
         logging.info(msg)
+
+
+def get_years():
+    current_year = datetime.now().year
+    years = [str(year) for year in range(2021, current_year + 1)]
+    return current_year, years

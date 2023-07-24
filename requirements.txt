@@ -1,0 +1,3 @@
+tkcalendar
+boto3
+'mysql-connector-python'
