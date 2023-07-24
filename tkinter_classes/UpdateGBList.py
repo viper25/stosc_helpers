@@ -6,7 +6,6 @@ class UpdateGBList(customtkinter.CTkFrame):
     def button_callback(self):
         print(f"Update DB Flag: {self.update_db_flag.get()}")
         eligibility_lists = update_gb_eligibility.process_eligible_GB_members(save_file="eligible_members.csv",
-                                                                              member_list="member_list.csv",
                                                                               update_db_flag=self.update_db_flag.get())
         print(f"Eligible: {eligibility_lists[0]}")
         print(f"Ineligible: {eligibility_lists[1]}")

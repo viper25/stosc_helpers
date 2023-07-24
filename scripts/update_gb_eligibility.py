@@ -13,6 +13,8 @@ Principle: Loop through all members. For each member, check each invoice. Set el
 by checking invoices. The moment you can prove eligibility is False, break the loop and check the next member.
 """
 import datetime
+
+from scripts import generate_xero_contacts
 from utils import utils
 
 # https://github.com/CodeForeverAndEver/ColorIt
@@ -41,10 +43,10 @@ def update_CRM(m, e):
     db.update_gb_eligibility(m, e, MEMBERS_STATUS_CHANGE_ELIGIBLE, MEMBERS_STATUS_CHANGE_INELIGIBLE)
 
 
-def process_eligible_GB_members(save_file: str,
-                                member_list: str, update_db_flag: bool = False) -> list:
+def process_eligible_GB_members(save_file: str, update_db_flag: bool = False) -> list:
+    member_list_file_path = generate_xero_contacts.generate_xero_contact_list()
     # Loop through all members
-    with open(member_list, "r") as f:
+    with open(member_list_file_path, "r") as f:
         for line in f:
             eligibility = False
             line = line.strip()
@@ -130,7 +132,7 @@ if __name__ == "__main__":
     EXLUSION_LIST = config['gb_eligibility']['EXLUSION_LIST']
 
     eligibility_lists = process_eligible_GB_members(
-        member_list=config['gb_eligibility']['FILE_MEMBERS'],
+        member_list_file_path=config['gb_eligibility']['FILE_MEMBERS'],
         update_db_flag=config['gb_eligibility']['UPDATE_CRM_DB'],
         save_file=config['gb_eligibility']['FILE_ELIGIBLE_GB_MEMBERS']
     )

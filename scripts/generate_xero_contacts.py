@@ -2,6 +2,7 @@
 Generate Xero Contacts File that contains mapping of Xero contactID to memberID for 
 future easy lookup
 """
+import tomllib
 from utils import utils
 # https://github.com/CodeForeverAndEver/ColorIt
 from colorama import init, Fore
@@ -14,8 +15,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-file_name = "csv/xero_contacts.csv"
-# Use this to ensure that ColorIt will be usable by certain command line interfaces
+with open("config.toml", "rb") as f:
+    config = tomllib.load(f)
 
 
 def _get_Xero_Contacts():
@@ -40,24 +41,26 @@ def _get_Xero_Contacts():
                 }
                 for _contact in xero_contacts['Contacts']
                 if (
-                    'AccountNumber' in _contact
-                    # Exclude other contacts who have account numbers
-                    and len(_contact['AccountNumber']) == 4
-                    and _contact['ContactStatus'] == 'ACTIVE'
+                        'AccountNumber' in _contact
+                        # Exclude other contacts who have account numbers
+                        and len(_contact['AccountNumber']) == 4
+                        and _contact['ContactStatus'] == 'ACTIVE'
                 )
             ]
             contacts.extend(_contacts)
     return contacts
 
-def generate_xero_contact_list():
+
+def generate_xero_contact_list(save_file_path: str = config['gb_eligibility']['FILE_ELIGIBLE_GB_MEMBERS']):
+    # TODO: Ask for path to save CSV file
     print(f"{Fore.WHITE}Getting Member List...")
     list_Contacts = _get_Xero_Contacts()
     print(f"{Fore.YELLOW}Retrieved {Fore.GREEN}{len(list_Contacts)}{Fore.YELLOW} members. Sample Listing:")
     df_contacts = pd.DataFrame(list_Contacts)
     print(f"{Fore.BLUE}{df_contacts.head(2)}\n")
-    df_contacts.sort_values(by=['memberCode']).to_csv(file_name, index=False)
-    print(f"{Fore.WHITE}Written to {file_name}")
-    return f"{Fore.WHITE}Written to {file_name}"
+    df_contacts.sort_values(by=['memberCode']).to_csv(save_file_path, index=False)
+    print(f"{Fore.WHITE}Written to {save_file_path}")
+    return save_file_path
 
 
 if __name__ == '__main__':

@@ -12,8 +12,8 @@ class GenerateMembersFrame(customtkinter.CTkFrame):
         self.title = customtkinter.CTkLabel(self, text=self.title, fg_color="gray60", corner_radius=3)
         self.title.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="ew")
 
-        radio_button_active = customtkinter.CTkRadioButton(self, text="Active")
-        radio_button_inactive = customtkinter.CTkRadioButton(self, text="In Active")
+        radio_button_active = customtkinter.CTkRadioButton(self, text="Active Only")
+        radio_button_inactive = customtkinter.CTkRadioButton(self, text="All")
         radio_button_active.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="w")
         radio_button_inactive.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="w")
         self.radio_buttons.append(radio_button_active)
@@ -23,8 +23,8 @@ class GenerateMembersFrame(customtkinter.CTkFrame):
         self.button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
 
     def button_callback(self):
-        status = generate_xero_contacts.generate_xero_contact_list()
-        print(status)
+        file_path = generate_xero_contacts.generate_xero_contact_list()
+        print(f"Written to {file_path}")
 
     def get(self):
         checked_checkboxes = []
