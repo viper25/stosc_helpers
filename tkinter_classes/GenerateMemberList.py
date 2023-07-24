@@ -1,5 +1,8 @@
 import customtkinter
 
+from scripts import generate_xero_contacts
+
+
 class GenerateMembersFrame(customtkinter.CTkFrame):
     def __init__(self, master, title):
         super().__init__(master)
@@ -20,7 +23,8 @@ class GenerateMembersFrame(customtkinter.CTkFrame):
         self.button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
 
     def button_callback(self):
-        print("button pressed")
+        status = generate_xero_contacts.generate_xero_contact_list()
+        print(status)
 
     def get(self):
         checked_checkboxes = []

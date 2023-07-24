@@ -1,6 +1,6 @@
 import customtkinter
 
-from tkinter_classes.Members import GenerateMembersFrame
+from tkinter_classes.GenerateMemberList import GenerateMembersFrame
 from tkinter_classes.UpdateGBList import UpdateGBList
 
 
