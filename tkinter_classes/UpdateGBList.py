@@ -17,11 +17,15 @@ class UpdateGBList(customtkinter.CTkFrame):
         self.title = customtkinter.CTkLabel(self, text=self.title, fg_color="gray90", corner_radius=3)
         self.title.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="ew")
 
-        # Radio Button
+        # Checkbox
         self.update_db_flag = tkinter.BooleanVar(value=False)
-        self.radio_button = customtkinter.CTkRadioButton(self, text="Update CRM DB", variable=self.update_db_flag,
-                                                         value=True)
-        self.radio_button.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="nsew")
+        self.checkbox = customtkinter.CTkCheckBox(self,
+                                                  text="Update CRM DB",
+                                                  variable=self.update_db_flag,
+                                                  onvalue=True,
+                                                  offvalue=False
+                                                  )
+        self.checkbox.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="nsew")
 
         # Submit Button
         self.button = customtkinter.CTkButton(self, text="Update GB List", command=self.button_callback)
