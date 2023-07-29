@@ -48,6 +48,8 @@ with open("config.toml", "rb") as f:
     DATE_OF_GB_ELIGIBILITY_CHECK = datetime.strptime(config['gb_eligibility']['DATE_OF_GB_ELIGIBILITY_CHECK_STR'],
                                                      '%d-%m-%Y %I:%M%p')
     EXLUSION_LIST = config['gb_eligibility']['EXLUSION_LIST']
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -55,7 +57,8 @@ def update_CRM(m, e):
     db.update_gb_eligibility(m, e, MEMBERS_STATUS_CHANGE_ELIGIBLE, MEMBERS_STATUS_CHANGE_INELIGIBLE)
 
 
-def process_eligible_GB_members(save_file: str, update_db_flag: bool = False, export_to_txt_flag: bool = False) -> list:
+def process_eligible_GB_members(save_file: str, update_db_flag: bool = False, export_to_txt_flag: bool = False,
+                                ) -> list:
     member_list_file_path = generate_xero_contacts.generate_xero_contact_list()
     # Loop through all members
     with open(member_list_file_path, "r") as f:
@@ -133,8 +136,5 @@ def save_to_file(members, save_file: str):
 
 
 if __name__ == "__main__":
-
-    eligibility_lists = process_eligible_GB_members(
-        update_db_flag=config['gb_eligibility']['UPDATE_CRM_DB'],
-        save_file=config['gb_eligibility']['FILE_ELIGIBLE_GB_MEMBERS']
-    )
+    eligibility_lists = process_eligible_GB_members(save_file=config['gb_eligibility']['FILE_ELIGIBLE_GB_MEMBERS'],
+                                                    update_db_flag=config['gb_eligibility']['UPDATE_CRM_DB'])

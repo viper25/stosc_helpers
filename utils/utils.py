@@ -7,7 +7,7 @@ from colorit import *
 import time
 import tomllib
 
-with open("..\config.toml", "rb") as f:
+with open("config.toml", "rb") as f:
     toml_dict = tomllib.load(f)
 
 # Use this to ensure that ColorIt will be usable by certain command line interfaces
@@ -44,7 +44,8 @@ def __xero_get_access_token():
     response_dict = response.json()
     if response_dict['error'] == 'invalid_grant':
         print(color(f"Refresh Token expired. Please generate a new one using xoauth.exe", Colors.red))
-        exit(0)
+        logging.error(f"Refresh Token expired. Please generate a new one using xoauth.exe")
+        return
     current_refresh_token = response_dict['refresh_token']
 
     # Set new refresh token

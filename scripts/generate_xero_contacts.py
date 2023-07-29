@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-with open("..\config.toml", "rb") as f:
+with open("config.toml", "rb") as f:
     config = tomllib.load(f)
 
 

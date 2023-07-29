@@ -1,20 +1,16 @@
+import logging
 import tkinter
+import tkinter as tk
 
 import customtkinter
 
 from scripts import update_gb_eligibility
+from widget_classes.LogsDisplay import TkinterTextHandler
 
 
 class UpdateGBList(customtkinter.CTkFrame):
-    def button_callback(self):
-        print(f"Update DB Flag: {self.update_db_flag.get()}")
-        eligibility_lists = update_gb_eligibility.process_eligible_GB_members(save_file="eligible_members.csv",
-                                                                              update_db_flag=self.update_db_flag.get(),
-                                                                              export_to_txt_flag=self.export_to_txt_flag.get()
-                                                                              )
-        print(f"\n⛔ Members who became ineligible: {eligibility_lists[0]}")
-        print(f"✅ Members who became eligible: {eligibility_lists[1]}")
-        print("DONE")
+    # Create an instance variable to hold the logger
+    logger5 = None
 
     def __init__(self, master, title):
         super().__init__(master)
@@ -44,6 +40,36 @@ class UpdateGBList(customtkinter.CTkFrame):
         # Submit Button
         self.button = customtkinter.CTkButton(self, text="Update GB List", command=self.button_callback)
         self.button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
+
+        # Log Widget
+        text_log_widget = tk.Text(self, wrap='word', state='disabled', width=50, height=10, bg="black", fg="white")
+        text_log_widget.grid(row=4, column=0, padx=5, pady=5)
+
+        # Create and set the TkinterTextHandler for the root logger
+        text_handler = TkinterTextHandler(text_log_widget)
+        formatter = logging.Formatter('%(asctime)s [%(levelname)s] - %(message)s')
+        text_handler.setFormatter(formatter)
+        logging.getLogger().addHandler(text_handler)
+        logging.getLogger().setLevel(logging.INFO)
+        logging.debug("Initialized logging...")
+
+    def button_callback(self):
+        print(f"Update DB Flag: {self.update_db_flag.get()}")
+
+        logging.debug("Debug message")
+        logging.info("Info message")
+        logging.warning("Warning message")
+        logging.error("Error message")
+        logging.critical("Critical message")
+
+        eligibility_lists = update_gb_eligibility.process_eligible_GB_members(save_file="eligible_members.csv",
+                                                                              update_db_flag=self.update_db_flag.get(),
+                                                                              export_to_txt_flag=self.export_to_txt_flag.get()
+                                                                              )
+
+        print(f"\n⛔ Members who became ineligible: {eligibility_lists[0]}")
+        print(f"✅ Members who became eligible: {eligibility_lists[1]}")
+        print("DONE")
 
 
 # Main method

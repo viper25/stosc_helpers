@@ -7,7 +7,7 @@ import tomllib
 init_colorit()
 
 # Load config
-with open("..\config.toml", "rb") as f:
+with open("config.toml", "rb") as f:
     config = tomllib.load(f)
 
 USER = config['database']['USER']

@@ -1,10 +1,6 @@
-import os
-import sys
-
 import customtkinter
-
-from tkinter_classes.GenerateMemberList import GenerateMembersFrame
-from tkinter_classes.UpdateGBList import UpdateGBList
+from widget_classes.GenerateMemberList import GenerateMembersFrame
+from widget_classes.UpdateGBList import UpdateGBList
 
 
 class MyTabView(customtkinter.CTkTabview):
