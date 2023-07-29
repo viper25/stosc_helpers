@@ -13,17 +13,17 @@ Principle: Loop through all members. For each member, check each invoice. Set el
 by checking invoices. The moment you can prove eligibility is False, break the loop and check the next member.
 """
 import datetime
+import tomllib
+from datetime import date, datetime
 
-from scripts import generate_xero_contacts
-from utils import utils
-
+import pandas as pd
 # https://github.com/CodeForeverAndEver/ColorIt
 from colorit import *
-import pandas as pd
-from datetime import date, datetime
 from dateutil import relativedelta
+
+from scripts import generate_xero_contacts
 from utils import db
-import tomllib
+from utils import utils
 
 all_members = []
 # For all invoices Updated after since_date i.e. created this year
@@ -38,12 +38,24 @@ MEMBERS_STATUS_CHANGE_ELIGIBLE = set()
 MEMBERS_STATUS_CHANGE_INELIGIBLE = set()
 init_colorit()
 
+# ----------------------------------------------------------------------------------------------------------------------
+# To move this elsewhere
+
+# Load config
+with open("config.toml", "rb") as f:
+    config = tomllib.load(f)
+    # Date to compare against. This should be the date of GB announcement
+    DATE_OF_GB_ELIGIBILITY_CHECK = datetime.strptime(config['gb_eligibility']['DATE_OF_GB_ELIGIBILITY_CHECK_STR'],
+                                                     '%d-%m-%Y %I:%M%p')
+    EXLUSION_LIST = config['gb_eligibility']['EXLUSION_LIST']
+# ----------------------------------------------------------------------------------------------------------------------
+
 
 def update_CRM(m, e):
     db.update_gb_eligibility(m, e, MEMBERS_STATUS_CHANGE_ELIGIBLE, MEMBERS_STATUS_CHANGE_INELIGIBLE)
 
 
-def process_eligible_GB_members(save_file: str, update_db_flag: bool = False) -> list:
+def process_eligible_GB_members(save_file: str, update_db_flag: bool = False, export_to_txt_flag: bool = False) -> list:
     member_list_file_path = generate_xero_contacts.generate_xero_contact_list()
     # Loop through all members
     with open(member_list_file_path, "r") as f:
@@ -53,11 +65,11 @@ def process_eligible_GB_members(save_file: str, update_db_flag: bool = False) ->
             if line.startswith("memberCode"):
                 continue
             if line:
-                memberCode, Name, contactID = line.split(",")
-                if memberCode in EXLUSION_LIST:
+                member_code, name, contact_id = line.split(",")
+                if member_code in EXLUSION_LIST:
                     continue
-                print(color(f"Processing {Name} ({memberCode})", Colors.blue))
-                invoices = utils.get_Invoices(contactID)
+                print(color(f"Processing {name} ({member_code})", Colors.blue))
+                invoices = utils.get_invoices(contact_id)
                 if invoices["Invoices"]:
                     subscription_invoices = list(
                         filter(lambda x: x['InvoiceNumber'].startswith('INV-'), invoices["Invoices"]))
@@ -70,7 +82,7 @@ def process_eligible_GB_members(save_file: str, update_db_flag: bool = False) ->
                         # If latest years subscription has been paid then he's considered eligible.
                         if invoice["InvoiceNumber"].startswith(INVOICE_YEAR) and invoice["Status"] == "PAID":
                             eligibility = True
-                            print(color(f"\t{Name} ({memberCode}) is Eligible", Colors.green))
+                            print(color(f"\t{name} ({member_code}) is Eligible", Colors.green))
                             break
                         if invoice["Status"] == "PAID":
                             continue
@@ -87,28 +99,29 @@ def process_eligible_GB_members(save_file: str, update_db_flag: bool = False) ->
                                 days_diff_bw_last_payment_and_gb_date = r.months * 30 + r.years * 12 * 30 + r.days
                                 if days_diff_bw_last_payment_and_gb_date > -180:
                                     eligibility = True
-                                    print(color(f"\tSetting {Name} ({memberCode}) Eligible", Colors.green))
+                                    print(color(f"\tSetting {name} ({member_code}) Eligible", Colors.green))
                                 else:
                                     eligibility = False
-                                    print(color(f"\t{Name} ({memberCode}) is Ineligible", Colors.red))
+                                    print(color(f"\t{name} ({member_code}) is Ineligible", Colors.red))
                                     break
                             # Has not paid in the prior year, Not eligible. No need to check further.
                             elif year_of_invoice < datetime.now().year and months_paid_for == 0:
                                 eligibility = False
-                                print(color(f"\tSetting {Name} ({memberCode}) Ineligible", Colors.red))
+                                print(color(f"\tSetting {name} ({member_code}) Ineligible", Colors.red))
                                 break
                             # Not yet paid for this year. Set to eligibility = True and check previous year invoices
                             # where if not paid, it'll be reset to False.
                             # If the invoice being checked is for the current year, but it's not 6 months yet, he is toggle to eligibile
                             elif year_of_invoice == datetime.now().year and datetime.now().month <= 6:
                                 eligibility = True
-                                print(color(f"\tSetting {Name} ({memberCode}) Eligible", Colors.green))
+                                print(color(f"\tSetting {name} ({member_code}) Eligible", Colors.green))
 
-            all_members.append({"MemberCode": memberCode, "Name": Name, "Eligibility": eligibility})
+            all_members.append({"MemberCode": member_code, "Name": name, "Eligibility": eligibility})
             if update_db_flag:
-                update_CRM(memberCode, eligibility)
+                update_CRM(member_code, eligibility)
 
-    save_to_file(all_members, save_file)
+    if export_to_txt_flag:
+        save_to_file(all_members, save_file)
 
     # Return success code
     return [MEMBERS_STATUS_CHANGE_ELIGIBLE, MEMBERS_STATUS_CHANGE_INELIGIBLE]
@@ -117,19 +130,9 @@ def process_eligible_GB_members(save_file: str, update_db_flag: bool = False) ->
 def save_to_file(members, save_file: str):
     df = pd.DataFrame(members)
     df.to_csv(save_file, index=False)
-    print(f"\n⛔ Members who became ineligible: {MEMBERS_STATUS_CHANGE_INELIGIBLE}")
-    print(f"✅ Members who became eligible: {MEMBERS_STATUS_CHANGE_ELIGIBLE}")
-    print("DONE")
 
 
 if __name__ == "__main__":
-    # Load config
-    with open("..\config.toml", "rb") as f:
-        config = tomllib.load(f)
-    # Date to compare against. This should be the date of GB announcement
-    DATE_OF_GB_ELIGIBILITY_CHECK = datetime.strptime(config['gb_eligibility']['DATE_OF_GB_ELIGIBILITY_CHECK_STR'],
-                                                     '%d-%m-%Y %I:%M%p')
-    EXLUSION_LIST = config['gb_eligibility']['EXLUSION_LIST']
 
     eligibility_lists = process_eligible_GB_members(
         update_db_flag=config['gb_eligibility']['UPDATE_CRM_DB'],

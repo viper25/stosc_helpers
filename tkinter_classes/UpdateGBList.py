@@ -1,14 +1,20 @@
 import tkinter
+
 import customtkinter
+
 from scripts import update_gb_eligibility
+
 
 class UpdateGBList(customtkinter.CTkFrame):
     def button_callback(self):
         print(f"Update DB Flag: {self.update_db_flag.get()}")
         eligibility_lists = update_gb_eligibility.process_eligible_GB_members(save_file="eligible_members.csv",
-                                                                              update_db_flag=self.update_db_flag.get())
-        print(f"Eligible: {eligibility_lists[0]}")
-        print(f"Ineligible: {eligibility_lists[1]}")
+                                                                              update_db_flag=self.update_db_flag.get(),
+                                                                              export_to_txt_flag=self.export_to_txt_flag.get()
+                                                                              )
+        print(f"\n⛔ Members who became ineligible: {eligibility_lists[0]}")
+        print(f"✅ Members who became eligible: {eligibility_lists[1]}")
+        print("DONE")
 
     def __init__(self, master, title):
         super().__init__(master)
@@ -19,17 +25,25 @@ class UpdateGBList(customtkinter.CTkFrame):
 
         # Checkbox
         self.update_db_flag = tkinter.BooleanVar(value=False)
-        self.checkbox = customtkinter.CTkCheckBox(self,
-                                                  text="Update CRM DB",
-                                                  variable=self.update_db_flag,
-                                                  onvalue=True,
-                                                  offvalue=False
-                                                  )
-        self.checkbox.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="nsew")
+        self.export_to_txt_flag = tkinter.BooleanVar(value=False)
+        self.checkbox_update_db = customtkinter.CTkCheckBox(self,
+                                                            text="Update CRM DB",
+                                                            variable=self.update_db_flag,
+                                                            onvalue=True,
+                                                            offvalue=False
+                                                            )
+        self.checkbox_export_txt = customtkinter.CTkCheckBox(self,
+                                                             text="Export to text",
+                                                             variable=self.export_to_txt_flag,
+                                                             onvalue=True,
+                                                             offvalue=False
+                                                             )
+        self.checkbox_update_db.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="nsew")
+        self.checkbox_export_txt.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="nsew")
 
         # Submit Button
         self.button = customtkinter.CTkButton(self, text="Update GB List", command=self.button_callback)
-        self.button.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
+        self.button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
 
 
 # Main method

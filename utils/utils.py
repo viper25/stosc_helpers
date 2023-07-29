@@ -1,8 +1,6 @@
 from datetime import date, datetime
-import datetime
 import boto3
 from boto3.dynamodb.conditions import Key
-from datetime import datetime
 import requests
 import logging
 from colorit import *
@@ -31,7 +29,7 @@ def year_start():
 
 # ------------------------------------------------------
 # Refresh access_token. Use the refresh_token to keep the access_token "fresh" every 30 mins. 
-def __xero_get_Access_Token():
+def __xero_get_access_token():
     # Get current refresh token. Use xoauth.exe to generate a new one if it's expired    
     response = table.query(KeyConditionExpression=Key('token').eq(REFRESH_TOKEN_KEY))
     old_refresh_token = response['Items'][0]['refresh_token']
@@ -58,12 +56,12 @@ def __xero_get_Access_Token():
 # Make the GET HTTP call to XERO API
 def xero_get(url, **extra_headers):
     _headers = {
-        'Authorization': 'Bearer ' + __xero_get_Access_Token(),
+        'Authorization': 'Bearer ' + __xero_get_access_token(),
         'Accept': 'application/json',
         'Xero-tenant-id': xero_tenant_id
     }
     # Some API calls require adding the modified date to get just this year's transaction and 
-    # not from the very begining
+    # not from the very beginning
     if extra_headers:
         _headers.update(extra_headers)
     response = requests.get(url, headers=_headers)
@@ -83,7 +81,7 @@ def xero_get(url, **extra_headers):
 # Make the POST HTTP call to XERO API
 def xero_post(*args, **extra_headers):
     _headers = {
-        'Authorization': 'Bearer ' + __xero_get_Access_Token(),
+        'Authorization': 'Bearer ' + __xero_get_access_token(),
         'Accept': 'application/json',
         'Xero-tenant-id': xero_tenant_id
     }
@@ -107,13 +105,13 @@ def xero_post(*args, **extra_headers):
 
 # -----------------------------------------------------------------------------------
 # Parse weird Xero dates of format: /Date(1618963200000+0000)/
-def parse_Xero_Date(_date):
+def parse_xero_date(_date):
     return datetime.fromtimestamp(int(_date[6:-2].split('+')[0]) / 1000)
 
 
 # -----------------------------------------------------------------------------------
 # Get the Xero Contact ID from the Account Code
-def get_ContactID(code=None):
+def get_contact_id(code=None):
     if code is None:
         url = 'https://api.xero.com/api.xro/2.0/Contacts'
         contacts = xero_get(url)
@@ -129,7 +127,7 @@ def get_ContactID(code=None):
 
 
 # -----------------------------------------------------------------------------------
-def get_Invoices(_contactID):
+def get_invoices(_contactID):
     if _contactID:
         url = f'https://api.xero.com/api.xro/2.0/Invoices?ContactIDs={_contactID}&Statuses=AUTHORISED,PAID&where=Type="ACCREC"'
         # Add If-Modified-Since HTTP header to get this year's invoices only
@@ -156,19 +154,19 @@ def get_last_subscription_amount_by_contact_id(contact_id, member_code):
         if len(list_last_invoice) == 1:
             subscription_amt = list_last_invoice[0]["Total"]
             if "pro" in list_last_invoice[0]['LineItems'][0]['Description']:
-                my_logger.info(f"\t{member_code} has pro-rated subscription - fix manually", Colors.orange)
+                MyLogger.info(f"\t{member_code} has pro-rated subscription - fix manually", Colors.orange)
         elif len(list_last_invoice) == 0:
-            my_logger.warn(
+            MyLogger.warn(
                 f"{member_code} has no previous subscription for '{SEARCH_STRING_FOR_PREVIOUS_SUBSCRIPTION}-*'; Skipping"
             )
             subscription_amt = None
         elif len(list_last_invoice) > 1:
-            my_logger.warn(
+            MyLogger.warn(
                 f"{member_code} has more than one subscription for '{SEARCH_STRING_FOR_PREVIOUS_SUBSCRIPTION}-*'; setting to 0"
             )
             subscription_amt = 0
     else:
-        my_logger.warn(f"No Invoices found for {member_code}")
+        MyLogger.warn(f"No Invoices found for {member_code}")
         return None
     return subscription_amt
 
@@ -190,7 +188,7 @@ logging.basicConfig(
 
 
 # Override the logging functionality to use colorit
-class my_logger():
+class MyLogger():
     def warn(msg):
         print(color(f"{msg}", Colors.red))
         logging.warning(msg)
