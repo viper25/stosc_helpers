@@ -42,6 +42,9 @@ def __xero_get_access_token():
         'refresh_token': old_refresh_token
     })
     response_dict = response.json()
+    if response_dict['error'] == 'invalid_grant':
+        print(color(f"Refresh Token expired. Please generate a new one using xoauth.exe", Colors.red))
+        exit(0)
     current_refresh_token = response_dict['refresh_token']
 
     # Set new refresh token
